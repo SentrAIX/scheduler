@@ -1,0 +1,43 @@
+name: Publish Scheduler to ACR
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to ACR using az CLI
+        run: |
+          ACR_FULL=$(echo "${{ secrets.ACR_LOGIN_SERVER }}" | sed 's/[^a-zA-Z0-9.-]//g')
+          ACR_NAME=$(echo "$ACR_FULL" | cut -d'.' -f1)
+          echo "ACR_NAME: $ACR_NAME"
+          az acr login --name $ACR_NAME
+
+      - name: Build and push Docker image
+        run: |
+          ACR_FULL=$(echo "${{ secrets.ACR_LOGIN_SERVER }}" | sed 's/[^a-zA-Z0-9.-]//g')
+          docker build -t ${ACR_FULL}/scheduler:latest -t ${ACR_FULL}/scheduler:${{ github.sha }} ./scheduler
+          docker push ${ACR_FULL}/scheduler:latest
+          docker push ${ACR_FULL}/scheduler:${{ github.sha }}
+
+      - name: Log pushed image
+        run: |
+          echo "Pushed image tags: ${{ secrets.ACR_LOGIN_SERVER }}/scheduler:latest and ${{ secrets.ACR_LOGIN_SERVER }}/scheduler:${{ github.sha }}"
