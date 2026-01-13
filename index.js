@@ -5,7 +5,7 @@ const axios = require('axios');
 const _pRetry = require('p-retry');
 const pRetry = (_pRetry && _pRetry.default) ? _pRetry.default : _pRetry;
 const qs = require('querystring');
- 
+
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 const API_KEY = process.env.API_KEY || '';
 const POLL_INTERVAL_SECONDS = parseInt(process.env.POLL_INTERVAL_SECONDS || '120', 10);
