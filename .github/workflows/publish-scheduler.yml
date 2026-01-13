@@ -34,7 +34,7 @@ jobs:
       - name: Build and push Docker image
         run: |
           ACR_FULL=$(echo "${{ secrets.ACR_LOGIN_SERVER }}" | sed 's/[^a-zA-Z0-9.-]//g')
-          docker build -t ${ACR_FULL}/scheduler:latest -t ${ACR_FULL}/scheduler:${{ github.sha }} ./scheduler
+          docker build -t ${ACR_FULL}/scheduler:latest -t ${ACR_FULL}/scheduler:${{ github.sha }} .
           docker push ${ACR_FULL}/scheduler:latest
           docker push ${ACR_FULL}/scheduler:${{ github.sha }}
 
