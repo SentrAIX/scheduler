@@ -1,9 +1,12 @@
 require('dotenv').config();
 const axios = require('axios');
-// p-retry v5 is ESM; when required from CommonJS this may be an object
-// with a `.default` property. Normalize to the callable function.
-const _pRetry = require('p-retry');
-const pRetry = (_pRetry && _pRetry.default) ? _pRetry.default : _pRetry;
+// p-retry v5 is ESM-only. Load it dynamically so CommonJS entrypoint
+// can still initialize the module at runtime without using `require()`.
+let pRetry;
+async function initPRetry() {
+  const _pRetry = await import('p-retry');
+  pRetry = (_pRetry && _pRetry.default) ? _pRetry.default : _pRetry;
+}
 const qs = require('querystring');
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
@@ -122,6 +125,8 @@ async function runOnce() {
 
 async function start() {
   console.info(`[scheduler] Starting scheduler (poll every ${POLL_INTERVAL_SECONDS}s)`);
+  // Ensure ESM-only dependencies are loaded before first run.
+  await initPRetry();
   // Run immediately, then interval
   await runOnce();
   setInterval(runOnce, POLL_INTERVAL_SECONDS * 1000);
