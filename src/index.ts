@@ -99,7 +99,7 @@ async function runOnce() {
     console.info('[scheduler] processPending response:', resp);
   } catch (err: any) {
     // eslint-disable-next-line no-console
-    console.error('[scheduler] Error during run:', err && err.message ? err.message : err);
+    console.error('[scheduler] Error during run:', err && err.stack ? err.stack : err);
   }
 }
 
@@ -113,6 +113,6 @@ async function start() {
 
 start().catch(err => {
   // eslint-disable-next-line no-console
-  console.error('[scheduler] Unhandled error starting scheduler:', err && err.message ? err.message : err);
+  console.error('[scheduler] Unhandled error starting scheduler:', err && err.stack ? err.stack : err);
   process.exit(1);
 });

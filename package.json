@@ -1,5 +1,6 @@
 {
   "name": "sentraix-scheduler",
+  "type": "module",
   "version": "0.1.0",
   "description": "Lightweight scheduler to call SentrAIX API endpoints (billing, runs).",
   "main": "dist/index.js",
