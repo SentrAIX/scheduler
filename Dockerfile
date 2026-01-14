@@ -3,7 +3,8 @@ FROM node:18-alpine AS build
 # Build stage: install deps and compile TypeScript
 WORKDIR /usr/src/app
 COPY package.json package-lock.json* tsconfig.json ./
-RUN npm ci
+# Use npm install so build works even if package-lock.json is not present
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -12,7 +13,8 @@ WORKDIR /usr/src/app
 
 # Install only production deps
 COPY package.json package-lock.json* ./
-RUN npm ci --production --no-audit --no-fund
+# Use npm install --production when no lockfile is present
+RUN npm install --production --no-audit --no-fund
 
 # Copy compiled output
 COPY --from=build /usr/src/app/dist ./dist
