@@ -1,18 +1,25 @@
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
-# Create app directory
+# Build stage: install deps and compile TypeScript
+WORKDIR /usr/src/app
+COPY package.json package-lock.json* tsconfig.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:18-alpine
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Install only production deps
 COPY package.json package-lock.json* ./
-RUN npm install --production --no-audit --no-fund
+RUN npm ci --production --no-audit --no-fund
 
-# Bundle app source
-COPY . .
+# Copy compiled output
+COPY --from=build /usr/src/app/dist ./dist
 
 # Use a non-root user for security
 RUN addgroup -S app && adduser -S app -G app
 USER app
 
 # Default command
-CMD ["node", "index.js"]
+CMD ["node", "dist/index.js"]

@@ -2,14 +2,22 @@
   "name": "sentraix-scheduler",
   "version": "0.1.0",
   "description": "Lightweight scheduler to call SentrAIX API endpoints (billing, runs).",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "node index.js",
-    "build": "echo \"no build step for scheduler\""
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.0.0",
     "p-retry": "^5.0.0"
+  }
+  ,
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.0.0"
   }
 }

@@ -17,6 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:
@@ -30,6 +35,11 @@ jobs:
           ACR_NAME=$(echo "$ACR_FULL" | cut -d'.' -f1)
           echo "ACR_NAME: $ACR_NAME"
           az acr login --name $ACR_NAME
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
 
       - name: Build and push Docker image
         run: |
