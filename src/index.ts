@@ -14,8 +14,8 @@ async function initPRetry(): Promise<void> {
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 const API_KEY = process.env.API_KEY || '';
-const POLL_INTERVAL_BILLING_SECONDS = parseInt(process.env.POLL_INTERVAL_BILLING_SECONDS || process.env.POLL_INTERVAL_SECONDS || '120', 10);
-const POLL_INTERVAL_SCHEDULER_SECONDS = parseInt(process.env.POLL_INTERVAL_SCHEDULER_SECONDS || process.env.POLL_INTERVAL_SECONDS || '120', 10);
+const POLL_INTERVAL_BILLING_SECONDS = parseInt(process.env.POLL_INTERVAL_BILLING_SECONDS || '120', 10);
+const POLL_INTERVAL_SCHEDULER_SECONDS = parseInt(process.env.POLL_INTERVAL_SCHEDULER_SECONDS || '120', 10);
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '100', 10);
 const HTTP_TIMEOUT_MS = parseInt(process.env.HTTP_TIMEOUT_MS || '30000', 10);
 
