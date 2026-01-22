@@ -74,7 +74,7 @@ axiosClient.interceptors.request.use(async (config) => {
   }
   return config;
 }, (err) => Promise.reject(err));
-
+ 
 /**
  * Request the API to process pending billing events. The scheduler is only
  * responsible for triggering processing; the API implements the actual work.
