@@ -28,7 +28,6 @@ if (!API_KEY && !(KEYCLOAK_ISSUER_URL && KEYCLOAK_REALM && KEYCLOAK_CLIENT_ID &&
   // eslint-disable-next-line no-console
   console.warn('Warning: No API_KEY or Keycloak client-credentials configured. Scheduler calls will be unauthenticated.');
 }
-
 const axiosClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL.replace(/\/$/, '') + '/api',
   timeout: HTTP_TIMEOUT_MS,
@@ -117,6 +116,31 @@ async function triggerSchedule(requestId: string, scheduledAt: string) {
 
 async function runBillingOnce() {
   try {
+    // Query the API for the license type stored in the DB. If the org is on a
+    // trial license, skip billing runs.
+    try {
+      const licResp = await axiosClient.get('/organizations');
+      const data = licResp && (licResp as any).data;
+      let org: any = null;
+      if (Array.isArray(data)) {
+        org = data.length > 0 ? data[0] : null;
+      } else {
+        org = data || null;
+      }
+
+      const licType = (org && (org.license || org.plan || org.type) || '').toString().toLowerCase();
+      if (licType === 'trial') {
+        console.info('[scheduler] License type is trial (API). Skipping billing run.');
+        return;
+      }
+      else { 
+        console.info(`[scheduler] License type is ${licType} (API). Proceeding with billing.`); }
+    } 
+  catch (err: any) {
+      // If we cannot determine the license (auth error, 404, network), log and proceed
+      console.info('[scheduler] Could not determine license type from API, proceeding with billing.', err && err.response ? { status: err.response.status } : err && err.message ? { message: err.message } : err);
+    }
+
     console.info(`[scheduler] Polling for pending billing events (limit=${BATCH_SIZE})`);
     const resp = await processPending(BATCH_SIZE);
     console.info('[scheduler] processPending response:', resp);
