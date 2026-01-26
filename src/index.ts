@@ -121,20 +121,16 @@ async function runBillingOnce() {
     try {
       const licResp = await axiosClient.get('/organizations');
       const data = licResp && (licResp as any).data;
-      let org: any = null;
-      if (Array.isArray(data)) {
-        org = data.length > 0 ? data[0] : null;
-      } else {
-        org = data || null;
-      }
 
-      const licType = (org && (org.license || org.plan || org.type) || '').toString().toLowerCase();
-      if (licType === 'trial') {
-        console.info('[scheduler] License type is trial (API). Skipping billing run.');
-        return;
-      }
-      else { 
-        console.info(`[scheduler] License type is ${licType} (API). Proceeding with billing.`); }
+      // If API returned an array of organizations, skip billing if any org is on trial.
+      if (Array.isArray(data)) {
+        const anyTrial = data.some((o: any) => ((o && (o.license || o.plan || o.type) || '').toString().toLowerCase()) === 'trial');
+        if (anyTrial) {
+          console.info('[scheduler] At least one organization is on trial (API). Skipping billing run.');
+          return;
+        }
+        console.info('[scheduler] No organizations on trial (API). Proceeding with billing.');
+      } 
     } 
   catch (err: any) {
       // If we cannot determine the license (auth error, 404, network), log and proceed
