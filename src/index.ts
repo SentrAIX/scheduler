@@ -138,7 +138,7 @@ async function runBillingOnce() {
     }
 
     console.info(`[scheduler] Polling for pending billing events (limit=${BATCH_SIZE})`);
-    console.info('[scheduler] Polling for pending token usage');
+    console.info(`[scheduler] Polling for pending token usage (limit=${BATCH_SIZE})`);
     const resp = await processPending(BATCH_SIZE);
     console.info('[scheduler] processPending response:', resp);
   } catch (err: any) {
